@@ -19,7 +19,7 @@ Basic Traditional Bloom Filter Implementation
 --------------------------------------------
 A C++ implementation of a bloom filter
 
-at /scratch/bloomfilter
+at /scratch/bloomfilter/
 
 For a better, well-tested, scalable, counting bloom filter, check
 out [dablooms](http://github.com/bitly/dablooms) built by Justin
