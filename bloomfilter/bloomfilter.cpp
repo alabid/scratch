@@ -70,7 +70,7 @@ BloomFilter::~BloomFilter() {
 // add item (int) to filter
 void BloomFilter::add(int item) {
   total = total + 1;
-  unsigned int hashval = NULL;
+  unsigned int hashval = 0;
   for (unsigned int j = 0; j < d; j++) {
     hashval = (hashes[j][0]*item+hashes[j][1])%w;
     C[j][hashval] = true;
@@ -86,7 +86,7 @@ void BloomFilter::add(const char *str) {
 // returns True if item (int) is probably in the bloom filter
 // returns False if item (int) is definitely not in the bloom filter
 bool BloomFilter::contains(int item) {
-  unsigned int hashval = NULL;
+  unsigned int hashval = 0;
   for (unsigned int j = 0; j < d; j++) {
     hashval = (hashes[j][0]*item+hashes[j][1])%w;
     if (!C[j][hashval]) {
@@ -119,7 +119,7 @@ void BloomFilter::genajbj(int** hashes, int i) {
 unsigned int BloomFilter::hashstr(const char *str) {
   unsigned long hash = 5381;
   int c;
-  while (c = *str++) {
+  while ((c = *str++)) {
     hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
   }
   return hash;
