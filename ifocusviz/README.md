@@ -20,7 +20,7 @@ Requires:
 To run:
 * First package the project as a jar using `sbt package` in the `ifocus/spark` directory.
 * Then run one of the `*Estimator` classes:
-`ExactEstimator`, `IFocusEstimator`, or ``
+`ExactEstimator`, `IFocusEstimator`, or `IFocusVizEstimator`
 For example, to run `IFocusEstimator` on the January 2015 - April 2015 datasets use:
 ```
 $SPARK_HOME/bin/spark-submit --class "IFocusEstimator" --master "local[4]" target/scala-2.10/ifocusviz_2.10-1.0.jar "../data/cleaned_states_dep_delay_jan.csv,../data/cleaned_states_dep_delay_feb.csv,../data/cleaned_states_dep_delay_mar.csv,../data/cleaned_states_dep_delay_apr.csv"
