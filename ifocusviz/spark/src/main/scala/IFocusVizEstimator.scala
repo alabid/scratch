@@ -11,9 +11,9 @@ import org.apache.spark.SparkConf
 import collection.mutable.{Map => MutMap}
 
 /**
-  * Usage: IFocusEstimator [location of delays file] 
+  * Usage: IFocusVizEstimator [location of delays file] 
   */
-object IFocusEstimator {
+object IFocusVizEstimator {
 
   /**
     *  Returns a sample of constant size.
@@ -34,12 +34,12 @@ object IFocusEstimator {
     Logger.getLogger("akka").setLevel(Level.OFF)
 
     if (args.length == 0 /* || !Files.exists(Paths.get(args(0)))*/) {
-      println("Usage: IFocusEstimator [location of delays file]")
+      println("Usage: IFocusVizEstimator [location of delays file]")
       System.exit(1)
     }
 
     val delaysFile = args(0)
-    val sparkConf = new SparkConf().setAppName("IFocus Estimator")
+    val sparkConf = new SparkConf().setAppName("IFocusViz Estimator")
     val sc = new SparkContext(sparkConf)
 
     val delaysData = sc.textFile(delaysFile)
@@ -56,14 +56,14 @@ object IFocusEstimator {
     ).toMap
 
     val startTime = System.nanoTime
-    for ((state, approxAggValue) <- ifocus(groupedData, 0.05)) {
+    for ((state, approxAggValue) <- ifocusViz(groupedData, 0.05)) {
       println("state: %s; approx average delay:%.2f; E(v)=%d".format(
         state,
         approxAggValue,
         encoding(approxAggValue)
       ))
     }
-    println("IFocusEstimator ran for %s".format((System.nanoTime-startTime)/1e9))
+    println("IFocusVizEstimator ran for %s".format((System.nanoTime-startTime)/1e9))
   }
 
   /**
@@ -86,7 +86,9 @@ object IFocusEstimator {
 
     for ((otherKey, otherVal) <- approxs if key != otherKey) {
       val ival2 = (otherVal - eps, otherVal + eps)
-      if (!(ival2._2 < ival1._1 || ival2._1 > ival1._2)) {
+      if (!(ival2._2 < ival1._1 || ival2._1 > ival1._2) &&
+        (encoding(ival2._2 - ival1._1) >= perceptual(ival2._2 - ival1._1) ||
+          encoding(ival1._2 - ival2._1) >= perceptual(ival2._1 - ival1._2))) {
         return true
       }
     }
@@ -94,7 +96,7 @@ object IFocusEstimator {
     false
   }
 
-  def ifocus(groupMap: Map[String, RDD[Int]], delta: Double): MutMap[String, Double] = {
+  def ifocusViz(groupMap: Map[String, RDD[Int]], delta: Double): MutMap[String, Double] = {
     val approxs = MutMap[String, Double]()
     var done = groupMap.keys.toSet
     // number of groups
