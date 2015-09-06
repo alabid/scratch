@@ -15,14 +15,18 @@ import collection.mutable.{Map => MutMap}
   */
 object IFocusVizEstimator {
 
-  var totalSampled: Int = 0
+  var numSamples: Int = 0
+  var numDataSampled: Int = 0
 
   /**
     *  Returns a sample of constant size.
     */
   def constantSample(group: RDD[Int]) : Array[Int] = {
     val x = group.takeSample(false, 20)
-    totalSampled += x.size
+
+    numDataSampled += x.size
+    numSamples += 1
+
     x
   }
 
@@ -95,8 +99,8 @@ object IFocusVizEstimator {
         val ei2 = encoding(ival1._2)
         val ej1 = encoding(ival2._1)
         val ej2 = encoding(ival2._2)
-        if (ej2 - ei1 > perceptual(ej2, ei1) ||
-          ei2 - ej1 > perceptual(ei2, ej1)) {
+        if (ej2 - ei1 >= perceptual(ej2, ei1) ||
+          ei2 - ej1 >= perceptual(ei2, ej1)) {
           return true
         }
       }
@@ -147,7 +151,8 @@ object IFocusVizEstimator {
     }
 
     println("Iterations: %d".format(m))
-    println("Total sampled: %d".format(totalSampled))
+    println("Total number of samples: %d".format(numSamples))
+    println("Total data sampled: %d".format(numDataSampled))
     approxs
   }
 }

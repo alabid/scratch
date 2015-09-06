@@ -15,14 +15,18 @@ import collection.mutable.{Map => MutMap}
   */
 object IFocusEstimator {
 
-  var totalSampled: Int = 0
+  var numSamples: Int = 0
+  var numDataSampled: Int = 0
 
   /**
     *  Returns a sample of constant size.
     */
   def constantSample(group: RDD[Int]) : Array[Int] = {
     val x = group.takeSample(false, 20)
-    totalSampled += x.size
+
+    numDataSampled += x.size
+    numSamples += 1
+
     x
   }
 
@@ -140,7 +144,8 @@ object IFocusEstimator {
     }
 
     println("Iterations: %d".format(m))
-    println("Total sampled: %d".format(totalSampled))
+    println("Total number of samples: %d".format(numSamples))
+    println("Total data sampled: %d".format(numDataSampled))
     approxs
   }
 }
