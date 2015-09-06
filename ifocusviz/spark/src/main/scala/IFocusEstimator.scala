@@ -15,11 +15,15 @@ import collection.mutable.{Map => MutMap}
   */
 object IFocusEstimator {
 
+  var totalSampled: Int = 0
+
   /**
     *  Returns a sample of constant size.
     */
   def constantSample(group: RDD[Int]) : Array[Int] = {
-    group.takeSample(false, 20)
+    val x = group.takeSample(false, 20)
+    totalSampled += x.size
+    x
   }
 
   /**
@@ -74,9 +78,9 @@ object IFocusEstimator {
   }
 
   /**
-    * Univariate perceptual function for this estimator.
+    * Bivariate perceptual function for this estimator.
     */
-  def perceptual(v: Double): Int = {
+  def perceptual(e1: Double, e2:Double): Int = {
     // universal perceptual function
     0
   }
@@ -136,6 +140,7 @@ object IFocusEstimator {
     }
 
     println("Iterations: %d".format(m))
+    println("Total sampled: %d".format(totalSampled))
     approxs
   }
 }

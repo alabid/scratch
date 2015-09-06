@@ -15,11 +15,15 @@ import collection.mutable.{Map => MutMap}
   */
 object IFocusVizEstimator {
 
+  var totalSampled: Int = 0
+
   /**
     *  Returns a sample of constant size.
     */
   def constantSample(group: RDD[Int]) : Array[Int] = {
-    group.takeSample(false, 20)
+    val x = group.takeSample(false, 20)
+    totalSampled += x.size
+    x
   }
 
   /**
@@ -74,9 +78,9 @@ object IFocusVizEstimator {
   }
 
   /**
-    * Univariate perceptual function for this estimator.
+    * Bivariate perceptual function for this estimator.
     */
-  def perceptual(v: Double): Int = {
+  def perceptual(e1: Double, e2:Double): Int = {
     // universal perceptual function
     0
   }
@@ -86,10 +90,15 @@ object IFocusVizEstimator {
 
     for ((otherKey, otherVal) <- approxs if key != otherKey) {
       val ival2 = (otherVal - eps, otherVal + eps)
-      if (!(ival2._2 < ival1._1 || ival2._1 > ival1._2) &&
-        (encoding(ival2._2 - ival1._1) >= perceptual(ival2._2 - ival1._1) ||
-          encoding(ival1._2 - ival2._1) >= perceptual(ival2._1 - ival1._2))) {
-        return true
+      if (!(ival2._2 < ival1._1 || ival2._1 > ival1._2)) {
+        val ei1 = encoding(ival1._1)
+        val ei2 = encoding(ival1._2)
+        val ej1 = encoding(ival2._1)
+        val ej2 = encoding(ival2._2)
+        if (ej2 - ei1 > perceptual(ej2, ei1) ||
+          ei2 - ej1 > perceptual(ei2, ej1)) {
+          return true
+        }
       }
     }
 
@@ -138,6 +147,7 @@ object IFocusVizEstimator {
     }
 
     println("Iterations: %d".format(m))
+    println("Total sampled: %d".format(totalSampled))
     approxs
   }
 }
